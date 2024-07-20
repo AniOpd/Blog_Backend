@@ -2,12 +2,13 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 const secret = process.env.SECRET;
-import cookieParser from "cookie-parser";
 
 
 export const userAuth = async (req,res,next)=>{
     try{
-        const token=req.cookies.token;
+        console.log("inside userAuth");
+        const {token} = req.body;
+        console.log(token);
         if(!token){
             return res.status(401).json({message:"Unauthorized"});
         }
@@ -16,7 +17,7 @@ export const userAuth = async (req,res,next)=>{
             return res.status(401).json({message:"Unauthorized"});
         }
         else{
-            req.userId=verified.id;
+            console.log(verified);
             next();
         }
     }catch(error){

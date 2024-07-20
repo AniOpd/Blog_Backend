@@ -20,7 +20,7 @@ export const register = async (req,res)=>{
             });
             await newUser.save();
             const token = jwt.sign({email:newUser.email,id:newUser._id},secret,{expiresIn:"90d"});
-            res.cookie("token",token,{ maxAge: 900000}).status(201).json({message:"User registered successfully"});
+            res.cookie("token",token).status(201).json({message:"User registered successfully",token,user:newUser._id,name:newUser.name,email:newUser.email});
         }else{
             res.status(400).json({message:"User already exists"});
         }
@@ -43,7 +43,7 @@ export const login = async (req,res)=>{
                 res.status(400).json({message:"Credentials not valid"});
             }else{
                 const token = jwt.sign({email:existingUser.email,id:existingUser._id},secret,{expiresIn:"90d"});
-                res.cookie("token",token).status(200).json({message:"User logged in successfully"});
+                res.cookie("token",token).status(200).json({token,message:"User logged in successfully",user:existingUser._id});
             }
         }
     }

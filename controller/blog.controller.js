@@ -3,8 +3,8 @@ import User from "../model/user.model.js";
 
 export const createBlog = async (req,res)=>{
     try{
-        const {title,content,image}=req.body;
-        const {userId}=req.params;
+        console.log("inside createBlog");
+        const {title,content,image,userId}=req.body;
         const newBlog = new blog({
             title,
             content,
@@ -22,7 +22,7 @@ export const createBlog = async (req,res)=>{
 export const getBlogs = async (req,res)=>{
     try{
         const blogs=await blog.find();
-        res.status(200).json(blogs);
+        res.status(200).json({blogs});
     }catch(error){
         console.error(`Error: ${error.message}`);
         res.status(500).json({message:"Server Error"});
@@ -31,7 +31,7 @@ export const getBlogs = async (req,res)=>{
 
 export const getBlog = async (req,res)=>{
     try{
-        const {id}=req.params;
+        const {id}=req.body;
         const blogData=await blog.findById(id);
         res.status(200).json(blogData);
     }catch(error){
@@ -42,7 +42,7 @@ export const getBlog = async (req,res)=>{
 
 export const updateBlog = async (req,res)=>{
     try{
-        const {id}=req.params;
+        const {id}=req.body;
         const {title,content,image}=req.body;
         await blog.findByIdAndUpdate(id,{title,content,image},{new:true});
         res.status(200).json({message:"Blog updated successfully"});
@@ -55,7 +55,7 @@ export const updateBlog = async (req,res)=>{
 
 export const deleteBlog = async (req,res)=>{
     try{
-        const {id}=req.params;
+        const {id}=req.body;
         await blog.findByIdAndDelete(id);
         res.status(200).json({message:"Blog deleted successfully"});
     }catch(error){
@@ -66,7 +66,7 @@ export const deleteBlog = async (req,res)=>{
 
 export const likeBlog = async (req,res)=>{
     try{
-        const {id}=req.params;
+        const {id}=req.body;
         const {userId}=req.body;
         const blogData=await blog.findById(id);
         const updatedBlog = await blog.findByIdAndUpdate(id,{likes:blogData.likes+1},{new:true});
@@ -83,7 +83,7 @@ export const likeBlog = async (req,res)=>{
 
 export const removeLike = async (req,res)=>{
     try{
-        const {id}=req.params;
+        const {id}=req.body;
         const {userId}=req.body;
         const blogData=await blog.findById(id);
         const updatedBlog = await blog.findByIdAndUpdate(id,{likes:blogData.likes-1},{new:true});
@@ -100,7 +100,7 @@ export const removeLike = async (req,res)=>{
 
 export const addComment = async (req,res)=>{
     try{
-        const {id}=req.params;
+        const {id}=req.body;
         const {userId,comment}=req.body;
         const blogData=await blog.findById(id);
         blogData.comments.push({userId,comment});
@@ -113,7 +113,7 @@ export const addComment = async (req,res)=>{
 
 export const removeComment = async (req,res)=>{
     try{
-        const {id}=req.params;
+        const {id}=req.body;
         const {commentId}=req.body;
         const blogData=await blog.findById(id);
         blogData.comments=blogData.comments.filter(comment=>comment._id!=commentId);
