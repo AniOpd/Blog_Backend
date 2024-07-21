@@ -3,13 +3,15 @@ import User from "../model/user.model.js";
 
 export const createBlog = async (req,res)=>{
     try{
-        console.log("inside createBlog");
         const {title,content,image,userId}=req.body;
+        const user= await User.findById(userId);
+        const author=user.name;
         const newBlog = new blog({
             title,
             content,
             image,
-            userId
+            userId,
+            author
         });
         await newBlog.save();
         res.status(201).json({message:"Blog created successfully"});

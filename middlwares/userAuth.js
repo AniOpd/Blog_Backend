@@ -6,9 +6,7 @@ const secret = process.env.SECRET;
 
 export const userAuth = async (req,res,next)=>{
     try{
-        console.log("inside userAuth");
         const {token} = req.body;
-        console.log(token);
         if(!token){
             return res.status(401).json({message:"Unauthorized"});
         }
