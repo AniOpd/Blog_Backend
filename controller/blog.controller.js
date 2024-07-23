@@ -1,5 +1,8 @@
 import blog from "../model/blog.model.js";
 import User from "../model/user.model.js";
+import express from "express";
+import {Transform} from 'stream';
+
 
 export const createBlog = async (req,res)=>{
     try{
@@ -23,8 +26,22 @@ export const createBlog = async (req,res)=>{
 
 export const getBlogs = async (req,res)=>{
     try{
-        const blogs=await blog.find();
-        res.status(200).json({blogs});
+        const transformData = new Transform({objectMode:true});
+        transformData.iswritten=false;
+        transformData._transform = function(chunk,encoding,callback){
+            if(!this.iswritten){
+                this.iswritten=true;
+                callback(null,"["+JSON.stringify(chunk));
+            }else{
+                callback(null,","+JSON.stringify(chunk));
+            }
+        }
+        transformData._flush = function(callback){
+            callback(null,"]");
+        }
+        const blogs= blog.find().cursor().pipe(transformData);
+        blogs.pipe(res);
+
     }catch(error){
         console.error(`Error: ${error.message}`);
         res.status(500).json({message:"Server Error"});
@@ -33,9 +50,14 @@ export const getBlogs = async (req,res)=>{
 
 export const getBlog = async (req,res)=>{
     try{
+        const transformData = new Transform({objectMode:true});
+        transformData.iswritten=false;
+        transformData._transform = function(chunk,encoding,callback){
+            callback(null,JSON.stringify(chunk));
+        }
         const {id}=req.body;
-        const blogData=await blog.findById(id);
-        res.status(200).json(blogData);
+        const blogData= blog.findById(id).cursor().pipe(transformData);
+        blogData.pipe(res);
     }catch(error){
         console.error(`Error: ${error.message}`);
         res.status(500).json({message:"Server Error"});
